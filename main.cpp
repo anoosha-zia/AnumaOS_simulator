@@ -32,7 +32,8 @@ int main() {
         cout << "5. Block Process (Interrupt)\n";
         cout << "6. Resume Process\n";
         cout << "7. Kill Process\n";
-        cout << "8. Shutdown OS\n";
+        cout<<  "8. Launch notepad\n";
+        cout << "9. Shutdown OS\n";
         cout << "=============================\n";
     while (true) {
         cout << "Enter choice: ";
@@ -99,6 +100,9 @@ int main() {
             os.interruptKill(pid);
         }
         else if (choice == 8) {
+        os.launchNotepad();
+        }
+        else if (choice == 9) {
             os.shutdown();
             break;
         }

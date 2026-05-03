@@ -1,4 +1,5 @@
 #include "OS.h"
+#include"tasks/notepad.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -173,4 +174,63 @@ void OperatingSystem::interruptResume(int pid) {
 
 void OperatingSystem::interruptKill(int pid) {
     scheduler.killProcess(pid);
+}
+
+//tasks
+#include "tasks/Notepad.h"   // adjust path if needed
+
+void OperatingSystem::launchNotepad() {
+
+    cout << "\n[OS] Launching Notepad...\n";
+
+    // create process for notepad
+    Process p(rand() % 1000 + 1, 5); // random PID, burst time
+
+    p.setType(Process::USER);
+    p.setPriority(2);
+    p.setRAM(1);
+    p.setHDD(1);
+
+    // check resources
+    if (!checkResources(1, 1)) {
+        cout << "[OS] Not enough resources!\n";
+        return;
+    }
+
+    allocateResources(1, 1);
+    createProcess(p);
+
+    // run actual app logic
+    Notepad np("note.txt");
+
+    int choice;
+    string text;
+
+    while (true) {
+
+        cout << "\n--- NOTEPAD ---\n";
+        cout << "1. Write\n2. Append\n3. View\n4. Exit\n";
+        cin >> choice;
+
+        cin.ignore();
+
+        if (choice == 1) {
+            cout << "Enter text: ";
+            getline(cin, text);
+            np.write(text);
+        }
+        else if (choice == 2) {
+            cout << "Enter text: ";
+            getline(cin, text);
+            np.append(text);
+        }
+        else if (choice == 3) {
+            np.view();
+        }
+        else {
+            cout << "[OS] Closing Notepad...\n";
+            freeResources(1, 1);
+            break;
+        }
+    }
 }
