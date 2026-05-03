@@ -30,4 +30,8 @@ public:
     void createProcess(Process p);
     void runMultilevelQueue(int quantum);
     void shutdown();
+    //INTERRUPT system
+    void interruptBlock(int pid);
+    void interruptResume(int pid);
+    void interruptKill(int pid);
 };

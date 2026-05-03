@@ -13,6 +13,9 @@ private:
     int highCount;
     int midCount;
     int lowCount;
+    //interrupt helpers
+    Process blockedQueue[50];
+    int blockedCount = 0;
 
     // helper for swapping (priority scheduling)
     void swap(Process &a, Process &b);
@@ -32,6 +35,10 @@ public:
     void runMultilevelQueue(int quantum);
     //print queues
     void printQueues();
+    //interrupts
+    void blockProcess(int pid);
+    void resumeProcess(int pid);
+    void killProcess(int pid);
 };
 
 #endif

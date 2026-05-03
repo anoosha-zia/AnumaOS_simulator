@@ -29,7 +29,10 @@ int main() {
         cout << "2. Kernel Mode ON\n";
         cout << "3. User Mode ON\n";
         cout << "4. Run MLQ(Multi Level Queue)\n";
-        cout << "7. Shutdown OS\n";
+        cout << "5. Block Process (Interrupt)\n";
+        cout << "6. Resume Process\n";
+        cout << "7. Kill Process\n";
+        cout << "8. Shutdown OS\n";
         cout << "=============================\n";
     while (true) {
         cout << "Enter choice: ";
@@ -75,8 +78,27 @@ int main() {
 
             os.runMultilevelQueue(q);
         }
+        else if (choice == 5) {
+            int pid;
+            cout << "Enter PID to block: ";
+            cin >> pid;
+            os.interruptBlock(pid);
+        }
+
+        else if (choice == 6) {
+            int pid;
+            cout << "Enter PID to resume: ";
+            cin >> pid;
+            os.interruptResume(pid);
+        }
 
         else if (choice == 7) {
+            int pid;
+            cout << "Enter PID to kill: ";
+            cin >> pid;
+            os.interruptKill(pid);
+        }
+        else if (choice == 8) {
             os.shutdown();
             break;
         }

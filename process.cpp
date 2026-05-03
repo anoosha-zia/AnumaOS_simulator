@@ -95,3 +95,17 @@ void Process::setType(Type t) { type = t; }
 
 void Process::setRAM(int r) { ramRequired = r; }
 void Process::setHDD(int h) { hddRequired = h; }
+void Process::block() {
+    if (state != TERMINATED)
+        state = BLOCKED;
+}
+
+void Process::unblock() {
+    if (state == BLOCKED)
+        state = READY;
+}
+
+void Process::kill() {
+    state = TERMINATED;
+    remainingTime = 0;
+}

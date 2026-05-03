@@ -162,3 +162,15 @@ void OperatingSystem::shutdown() {
 
     cout << "[OS] System safely powered off.\n";
 }
+//interrupt functionalities
+void OperatingSystem::interruptBlock(int pid) {
+    scheduler.blockProcess(pid);
+}
+
+void OperatingSystem::interruptResume(int pid) {
+    scheduler.resumeProcess(pid);
+}
+
+void OperatingSystem::interruptKill(int pid) {
+    scheduler.killProcess(pid);
+}

@@ -64,6 +64,10 @@ public:
 
     // Utility (for OS logging)
     void printInfo();
+    //interrupt functions
+    void block();
+    void unblock();
+    void kill();
 };
 
 #endif

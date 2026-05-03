@@ -193,3 +193,110 @@ void Scheduler::printQueues() {
     for (int i = 0; i < lowCount; i++)
         lowQueue[i].printInfo();
 }
+void Scheduler::blockProcess(int pid) {
+    bool found=false;
+    for (int i = 0; i < highCount; i++) {
+        if (highQueue[i].getPID() == pid) {
+            highQueue[i].block();
+            cout << "[INTERRUPT] PID " << pid << " BLOCKED (HIGH)\n";
+             found = true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < midCount; i++) {
+        if (midQueue[i].getPID() == pid) {
+            midQueue[i].block();
+            cout << "[INTERRUPT] PID " << pid << " BLOCKED (MEDIUM)\n";
+             found = true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < lowCount; i++) {
+        if (lowQueue[i].getPID() == pid) {
+            lowQueue[i].block();
+            cout << "[INTERRUPT] PID " << pid << " BLOCKED (LOW)\n";
+             found = true;
+            return;
+        }
+    }
+    if (!found) {
+        cout << "[INTERRUPT] ERROR: PID " << pid << " NOT FOUND\n";
+    }
+}
+//resume a process
+void Scheduler::resumeProcess(int pid) {
+    bool found = false;
+    for (int i = 0; i < highCount; i++) {
+        if (highQueue[i].getPID() == pid) {
+            highQueue[i].unblock();
+            cout << "[INTERRUPT] PID " << pid << " RESUMED (HIGH)\n";
+            found = true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < midCount; i++) {
+        if (midQueue[i].getPID() == pid) {
+            midQueue[i].unblock();
+            cout << "[INTERRUPT] PID " << pid << " RESUMED (MEDIUM)\n";
+            found=true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < lowCount; i++) {
+        if (lowQueue[i].getPID() == pid) {
+            lowQueue[i].unblock();
+            cout << "[INTERRUPT] PID " << pid << " RESUMED (LOW)\n";
+            found=true;
+            return;
+        }
+    }
+    if (!found) {
+        cout << "[INTERRUPT] ERROR: PID " << pid << " NOT FOUND\n";
+    }
+}
+//kill a process
+void Scheduler::killProcess(int pid) {
+
+    bool found = false;
+
+    for (int i = 0; i < highCount; i++) {
+        if (highQueue[i].getPID() == pid) {
+
+            highQueue[i].kill();
+            cout << "[INTERRUPT] PID " << pid << " KILLED (HIGH)\n";
+
+            found = true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < midCount && !found; i++) {
+        if (midQueue[i].getPID() == pid) {
+
+            midQueue[i].kill();
+            cout << "[INTERRUPT] PID " << pid << " KILLED (MEDIUM)\n";
+
+            found = true;
+            return;
+        }
+    }
+
+    for (int i = 0; i < lowCount && !found; i++) {
+        if (lowQueue[i].getPID() == pid) {
+
+            lowQueue[i].kill();
+            cout << "[INTERRUPT] PID " << pid << " KILLED (LOW)\n";
+
+            found = true;
+            return;
+        }
+    }
+
+    if (!found) {
+        cout << "[INTERRUPT] ERROR: PID " << pid << " NOT FOUND\n";
+    }
+}
