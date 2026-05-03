@@ -1,32 +1,51 @@
 #include "process.h"
-#include<iostream>
+#include <iostream>
+
 using namespace std;
+
+/*
+    Default constructor:
+    Initializes safe default process values.
+*/
 Process::Process() {
     pid = 0;
     burstTime = 0;
     remainingTime = 0;
-    state=READY
+
+    priority = 1;
+
+    ramRequired = 0;
+    hddRequired = 0;
+
+    state = READY;
+    type = USER;
 }
 
+/*
+    Parameterized constructor:
+    Creates process with execution time.
+*/
 Process::Process(int id, int bt) {
     pid = id;
     burstTime = bt;
     remainingTime = bt;
+
+    priority = 1;
+
+    ramRequired = 0;
+    hddRequired = 0;
+
+    state = READY;
+    type = USER;
 }
 
-int Process::getPID() {
-    return pid;
-}
-
-int Process::getBurstTime() {
-    return burstTime;
-}
-
-int Process::getRemainingTime() {
-    return remainingTime;
-}
-
+/*
+    execute:
+    Simulates CPU execution for given time slice.
+    This is used by Scheduler (Round Robin etc.)
+*/
 void Process::execute(int time) {
+
     state = RUNNING;
 
     if (remainingTime > time)
@@ -34,22 +53,45 @@ void Process::execute(int time) {
     else
         remainingTime = 0;
 
+    // If finished → terminate
     if (remainingTime == 0)
         state = TERMINATED;
     else
         state = READY;
 }
-int Process::getPriority() {
-    return priority;
+
+/*
+    printInfo:
+    Debug function for OS logs
+*/
+void Process::printInfo() {
+    cout << "PID: " << pid
+         << " | Burst: " << burstTime
+         << " | Remaining: " << remainingTime
+         << " | Priority: " << priority
+         << endl;
 }
 
-void Process::setPriority(int p) {
-    priority = p;
-}
-void Process::setState(State s) {
-    state = s;
-}
+/*
+    Getters
+*/
+int Process::getPID() { return pid; }
+int Process::getBurstTime() { return burstTime; }
+int Process::getRemainingTime() { return remainingTime; }
+int Process::getPriority() { return priority; }
 
-Process::State Process::getState() {
-    return state;
-}
+int Process::getRAM() { return ramRequired; }
+int Process::getHDD() { return hddRequired; }
+
+Process::State Process::getState() { return state; }
+Process::Type Process::getType() { return type; }
+
+/*
+    Setters
+*/
+void Process::setPriority(int p) { priority = p; }
+void Process::setState(State s) { state = s; }
+void Process::setType(Type t) { type = t; }
+
+void Process::setRAM(int r) { ramRequired = r; }
+void Process::setHDD(int h) { hddRequired = h; }

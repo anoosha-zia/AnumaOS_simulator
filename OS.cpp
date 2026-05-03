@@ -1,0 +1,164 @@
+#include "OS.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+/*
+    Constructor:
+    Initializes OS name and resets system state.
+*/
+OperatingSystem::OperatingSystem() {
+  
+
+    totalRAM = 0;
+    totalHDD = 0;
+    totalCores = 0;
+
+    usedRAM = 0;
+    usedHDD = 0;
+
+    kernelMode = false;
+}
+
+/*
+    bootScreen:
+    Custom boot screen (your design preserved)
+*/
+void OperatingSystem::bootScreen() {
+
+    system("clear");
+
+    cout<<"        ██████   ███    ██  ██   ██  ███    ███   ██████"<<endl;
+    cout<<"       ██    ██  ██ █   ██  ██   ██  ██ █  █ ██  ██    ██"<<endl;
+    cout<<"       ██ ██ ██  ██  █  ██  ██   ██  ██  ██  ██  ██ ██ ██"<<endl;
+    cout<<"       ██    ██  ██   █ ██  ██   ██  ██      ██  ██    ██"<<endl;
+    cout<<"       ██    ██  ██    ███   █████   ██      ██  ██    ██"<<endl;
+
+    cout<<"\n<><><><><><><><><><>    AnumaOS Booting     <><><><><><><><><>";
+    cout << endl;
+
+    cout<< "\n<><><><><><><><><><>      Loading...      <><><><><><><>"<<endl;
+
+    for(int i = 0; i < 7; i++){
+        cout << "      o";
+        cout.flush();
+
+        // using chrono instead of sleep()
+        this_thread::sleep_for(chrono::seconds(1));
+    }
+
+    cout << "\n\n<><><><><><><><><><>       System Ready!        <><><><><><><>\n";
+
+    this_thread::sleep_for(chrono::seconds(1));
+}
+
+/*
+    setHardware:
+    Initializes system hardware limits.
+*/
+void OperatingSystem::setHardware(int ram, int hdd, int cores) {
+
+    totalRAM = ram;
+    totalHDD = hdd;
+    totalCores = cores;
+
+    cout << "\n[OS] Hardware Initialized:\n";
+    cout << "RAM: " << totalRAM << " GB\n";
+    cout << "HDD: " << totalHDD << " GB\n";
+    cout << "CPU Cores: " << totalCores << "\n\n";
+}
+
+/*
+    Kernel Mode ON
+*/
+void OperatingSystem::enterKernelMode() {
+    kernelMode = true;
+    cout << "[KERNEL MODE ENABLED]\n";
+}
+
+/*
+    User Mode ON
+*/
+void OperatingSystem::enterUserMode() {
+    kernelMode = false;
+    cout << "[USER MODE ENABLED]\n";
+}
+
+bool OperatingSystem::isKernelMode() {
+    return kernelMode;
+}
+
+/*
+    Resource Check
+*/
+bool OperatingSystem::checkResources(int ram, int hdd) {
+    return (usedRAM + ram <= totalRAM &&
+            usedHDD + hdd <= totalHDD);
+}
+
+/*
+    Allocate Resources
+*/
+void OperatingSystem::allocateResources(int ram, int hdd) {
+    usedRAM += ram;
+    usedHDD += hdd;
+}
+
+/*
+    Free Resources
+*/
+void OperatingSystem::freeResources(int ram, int hdd) {
+    usedRAM -= ram;
+    usedHDD -= hdd;
+}
+
+/*
+    createProcess:
+    FULL integration with scheduler
+*/
+void OperatingSystem::createProcess(Process p) {
+
+    cout << "\n[OS] Creating Process PID: " << p.getPID() << endl;
+
+    // 1. Check resources
+    if (!checkResources(p.getRAM(), p.getHDD())) {
+        cout << "[OS] Not enough resources. Process rejected.\n";
+        return;
+    }
+
+    // 2. Allocate resources
+    allocateResources(p.getRAM(), p.getHDD());
+
+    // 3. Add to scheduler (READY QUEUE)
+    scheduler.addProcess(p);
+
+    cout << "[OS] Process added to Ready Queue\n";
+}
+
+/*
+    Scheduler Controls
+*/
+
+void OperatingSystem::runMultilevelQueue(int quantum) {
+
+    cout << "\n[OS] Launching Multilevel Queue Scheduler...\n";
+
+    scheduler.runMultilevelQueue(quantum);
+}
+/*
+    shutdown:
+    Terminates OS and clears all resources.
+*/
+void OperatingSystem::shutdown() {
+
+    cout << "\n[OS] Shutting down...\n";
+
+    cout << "[OS] Terminating all processes...\n";
+
+    usedRAM = 0;
+    usedHDD = 0;
+
+    cout << "[OS] System safely powered off.\n";
+}

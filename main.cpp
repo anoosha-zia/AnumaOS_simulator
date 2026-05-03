@@ -1,111 +1,90 @@
-#include<iostream>
-#include<unistd.h>
-#include "scheduler.h"
+#include "OS.h"
+#include "process.h"
+#include <iostream>
 
 using namespace std;
 
-// System variables (later you can move these to a System class)
-int totalRAM, usedRAM = 0;
-int totalHDD, usedHDD = 0;
-int cpuCores;
+int main() {
 
-// Boot screen
-void bootOS(){
-    system("clear");
+    OperatingSystem os;
 
-    cout<<"        ██████   ███    ██  ██   ██  ███    ███   ██████"<<endl;
-    cout<<"       ██    ██  ██ █   ██  ██   ██  ██ █  █ ██  ██    ██"<<endl;
-    cout<<"       ██ ██ ██  ██  █  ██  ██   ██  ██  ██  ██  ██ ██ ██"<<endl;
-    cout<<"       ██    ██  ██   █ ██  ██   ██  ██      ██  ██    ██"<<endl;
-    cout<<"       ██    ██  ██    ███   █████   ██      ██  ██    ██"<<endl;
+    os.bootScreen();
 
-    cout<<"\n<><><><><><><><><><>    AnumaOS Booting     <><><><><><><><><>";
-    cout << endl;
+    int ram, hdd, cores;
 
-    cout<< "\n<><><><><><><><><><>      Loading...      <><><><><><><>"<<endl;
+    cout << "Enter RAM (GB): ";
+    cin >> ram;
 
-    for(int i = 0; i < 7; i++){
-        cout << "      o";
-        cout.flush();
-        sleep(1);
-    }
+    cout << "Enter HDD (GB): ";
+    cin >> hdd;
 
-    cout << "\n\n<><><><><><><><><><>       System Ready!        <><><><><><><>\n";
-    sleep(1);
-}
+    cout << "Enter CPU cores: ";
+    cin >> cores;
 
-// Take hardware input
-void initializeSystem(){
-    cout << "Enter Total RAM (MB): ";
-    cin >> totalRAM;
+    os.setHardware(ram, hdd, cores);
 
-    cout << "Enter Hard Disk Size (GB): ";
-    cin >> totalHDD;
-
-    cout << "Enter Number of CPU Cores: ";
-    cin >> cpuCores;
-}
-
-// Display system info
-void showSystemInfo(){
-    cout << "\n<><><><> SYSTEM INFO <><><><>\n";
-    cout << "Total RAM: " << totalRAM << " MB\n";
-    cout << "Used RAM: " << usedRAM << " MB\n";
-    cout << "Total HDD: " << totalHDD << " GB\n";
-    cout << "Used HDD: " << usedHDD << " GB\n";
-    cout << "CPU Cores: " << cpuCores << endl;
-}
-
-// Process simulation function
-void runProcessSimulation() {
-    Scheduler scheduler;
-
-    // Sample processes (later: take input)
-    scheduler.addProcess(Process(1, 5));
-    scheduler.addProcess(Process(2, 3));
-    scheduler.addProcess(Process(3, 4));
-
-    scheduler.runFCFS();
-    scheduler.runRoundRobin(2);
-}
-
-// Main menu
-void menu(){
     int choice;
- cout << "\n<><><><> AnumaOS MENU <><><><>\n";
-        cout << "1. System Info\n";
-        cout << "2. Run Process Scheduler\n";
-        cout << "3. Running Processes (Coming Soon)\n";
-        cout << "4. Kernel Mode (Coming Soon)\n";
-        cout << "5. Shutdown\n";
-    do{
+ cout << "\n========== OS MENU ==========\n";
+        cout << "1. Create Process\n";
+        cout << "2. Kernel Mode ON\n";
+        cout << "3. User Mode ON\n";
+        cout << "4. Run MLQ(Multi Level Queue)\n";
+        cout << "7. Shutdown OS\n";
+        cout << "=============================\n";
+    while (true) {
         cout << "Enter choice: ";
         cin >> choice;
 
-        switch(choice){
-            case 1:
-                showSystemInfo();
-                break;
+        if (choice == 1) {
 
-            case 2:
-                runProcessSimulation();   //
-                break;
+            int id, bt, ramReq, hddReq, pr;
 
-            case 5:
-                cout << "\nShutting down AnumaOS...\n";
-                sleep(1);
-                break;
+            cout << "Enter PID: ";
+            cin >> id;
 
-            default:
-                cout << "Feature not implemented yet.\n";
+            cout << "Burst Time: ";
+            cin >> bt;
+
+            cout << "RAM Required: ";
+            cin >> ramReq;
+
+            cout << "HDD Required: ";
+            cin >> hddReq;
+
+            cout << "Priority: ";
+            cin >> pr;
+
+            Process p(id, bt);
+            p.setRAM(ramReq);
+            p.setHDD(hddReq);
+            p.setPriority(pr);
+
+            os.createProcess(p);
+        }
+        else if (choice == 2) {
+            os.enterKernelMode();
         }
 
-    } while(choice != 5);
-}
+        else if (choice == 3) {
+            os.enterUserMode();
+        }
+        else if (choice == 4) {
+             int q;
+            cout << "Enter Quantum for MLQ (User Queue): ";
+            cin >> q;
 
-int main(){
-    initializeSystem();
-    bootOS();
-    menu();
+            os.runMultilevelQueue(q);
+        }
+
+        else if (choice == 7) {
+            os.shutdown();
+            break;
+        }
+
+        else {
+            cout << "Invalid choice!\n";
+        }
+    }
+
     return 0;
 }

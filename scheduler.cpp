@@ -1,67 +1,195 @@
-#include <iostream>
 #include "scheduler.h"
+#include <iostream>
 using namespace std;
 
+/*
+    Constructor:
+    Initializes all queues
+*/
 Scheduler::Scheduler() {
-    count = 0;
+
+    highCount = 0;
+    midCount = 0;
+    lowCount = 0;
 }
 
+/*
+    swap:
+    Helper for priority sorting
+*/
+void Scheduler::swap(Process &a, Process &b) {
+    Process temp = a;
+    a = b;
+    b = temp;
+}
+
+/*
+    addProcess:
+    Routes process into correct queue based on type
+*/
 void Scheduler::addProcess(Process p) {
-    processes[count++] = p;
-}
 
-void Scheduler::runFCFS() {
-    cout << "Running FCFS Scheduling:\n";
+    if (p.getType() == Process::SYSTEM) {
 
-    for (int i = 0; i < count; i++) {
-        cout << "Process " << processes[i].getPID() << " executing...\n";
-
-        while (processes[i].getRemainingTime() > 0) {
-            processes[i].execute(1);
+        if (highCount < 50) {
+            highQueue[highCount++] = p;
+            cout << "[Scheduler] Added to HIGH queue (SYSTEM)\n";
         }
-        cout << "Process " << processes[i].getPID() << " finished.\n";
+
+    } 
+    else if (p.getType() == Process::USER) {
+
+        if (midCount < 50) {
+            midQueue[midCount++] = p;
+            cout << "[Scheduler] Added to MEDIUM queue (USER)\n";
+        }
+
+    } 
+    else {
+
+        if (lowCount < 50) {
+            lowQueue[lowCount++] = p;
+            cout << "[Scheduler] Added to LOW queue (BACKGROUND)\n";
+        }
     }
 }
-void Scheduler::runRoundRobin(int quantum) {
-    cout << "\nRunning Round Robin Scheduling:\n";
+
+/*
+    ============================
+    HIGH QUEUE → FCFS
+    ============================
+*/
+void Scheduler::executeFCFS(Process arr[], int &count) {
+
+    for (int i = 0; i < count; i++) {
+
+        cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+
+        arr[i].setState(Process::RUNNING);
+
+        while (arr[i].getRemainingTime() > 0) {
+            arr[i].execute(1);
+        }
+
+        arr[i].setState(Process::TERMINATED);
+
+        cout << "PID " << arr[i].getPID() << " completed (HIGH queue)\n";
+    }
+}
+
+/*
+    ============================
+    MEDIUM QUEUE → ROUND ROBIN
+    ============================
+*/
+void Scheduler::executeRoundRobin(Process arr[], int &count, int quantum) {
 
     bool done = false;
 
     while (!done) {
+
         done = true;
 
         for (int i = 0; i < count; i++) {
-            if (processes[i].getRemainingTime() > 0) {
+
+            if (arr[i].getRemainingTime() > 0) {
+
+                cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+
+                arr[i].setState(Process::RUNNING);
+
+                arr[i].execute(quantum);
+
+                if (arr[i].getRemainingTime() > 0)
+                    arr[i].setState(Process::READY);
+                else
+                    arr[i].setState(Process::TERMINATED);
+
                 done = false;
-
-                cout << "Process " << processes[i].getPID()
-                     << " executing for " << quantum << " units\n";
-
-                processes[i].execute(quantum);
-
-                if (processes[i].getRemainingTime() == 0) {
-                    cout << "Process " << processes[i].getPID() << " finished\n";
-                }
             }
         }
     }
 }
-void Scheduler::runPriorityScheduling() {
-    cout << "\nPriority Scheduling:\n";
 
+/*
+    ============================
+    LOW QUEUE → PRIORITY
+    ============================
+*/
+void Scheduler::executePriority(Process arr[], int &count) {
+
+    // sort by priority
     for (int i = 0; i < count - 1; i++) {
-        for (int j = i + 1; j < count; j++) {
-            if (processes[j].getPriority() < processes[i].getPriority()) {
-                swap(processes[i], processes[j]);
+        for (int j = 0; j < count - i - 1; j++) {
+
+            if (arr[j].getPriority() > arr[j + 1].getPriority()) {
+                swap(arr[j], arr[j + 1]);
             }
         }
     }
 
     for (int i = 0; i < count; i++) {
-        cout << "Process " << processes[i].getPID() << " running\n";
 
-        while (processes[i].getRemainingTime() > 0) {
-            processes[i].execute(1);
+        cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+
+        arr[i].setState(Process::RUNNING);
+
+        while (arr[i].getRemainingTime() > 0) {
+            arr[i].execute(1);
         }
+
+        arr[i].setState(Process::TERMINATED);
+
+        cout << "PID " << arr[i].getPID() << " completed (LOW queue)\n";
     }
+}
+
+/*
+    MAIN MLQ SCHEDULER
+*/
+void Scheduler::runMultilevelQueue(int quantum) {
+
+    cout << "\n==============================\n";
+    cout << " MULTILEVEL QUEUE STARTED\n";
+    cout << "==============================\n";
+
+    // 1. HIGH PRIORITY (SYSTEM)
+    if (highCount > 0) {
+        cout << "\n--- HIGH QUEUE (FCFS) ---\n";
+        executeFCFS(highQueue, highCount);
+    }
+
+    // 2. MEDIUM PRIORITY (USER)
+    if (midCount > 0) {
+        cout << "\n--- MEDIUM QUEUE (ROUND ROBIN) ---\n";
+        executeRoundRobin(midQueue, midCount, quantum);
+    }
+
+    // 3. LOW PRIORITY (BACKGROUND)
+    if (lowCount > 0) {
+        cout << "\n--- LOW QUEUE (PRIORITY) ---\n";
+        executePriority(lowQueue, lowCount);
+    }
+
+    cout << "\n==============================\n";
+    cout << " ALL QUEUES COMPLETED\n";
+    cout << "==============================\n";
+}
+
+/*
+    Debug function
+*/
+void Scheduler::printQueues() {
+
+    cout << "\n--- HIGH QUEUE ---\n";
+    for (int i = 0; i < highCount; i++)
+        highQueue[i].printInfo();
+
+    cout << "\n--- MEDIUM QUEUE ---\n";
+    for (int i = 0; i < midCount; i++)
+        midQueue[i].printInfo();
+
+    cout << "\n--- LOW QUEUE ---\n";
+    for (int i = 0; i < lowCount; i++)
+        lowQueue[i].printInfo();
 }
