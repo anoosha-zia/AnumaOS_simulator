@@ -1,5 +1,5 @@
 #include "OS.h"
-#include"tasks/notepad.h"
+#include"notepad.h"
 #include <iostream>
 #include <thread>
 #include <chrono>
@@ -177,60 +177,48 @@ void OperatingSystem::interruptKill(int pid) {
 }
 
 //tasks
-#include "tasks/Notepad.h"   // adjust path if needed
 
-void OperatingSystem::launchNotepad() {
 
-    cout << "\n[OS] Launching Notepad...\n";
+      void OperatingSystem::launchNotepad() {
 
-    // create process for notepad
-    Process p(rand() % 1000 + 1, 5); // random PID, burst time
+    cout << "\n[OS] Creating Notepad Process...\n";
 
-    p.setType(Process::USER);
-    p.setPriority(2);
-    p.setRAM(1);
-    p.setHDD(1);
-
-    // check resources
     if (!checkResources(1, 1)) {
         cout << "[OS] Not enough resources!\n";
         return;
     }
 
+    Process p(rand() % 1000 + 1, 7);
+    p.setTaskType(Process::NOTEPAD);
+    p.setPriority(2);
+
     allocateResources(1, 1);
-    createProcess(p);
+    scheduler.addProcess(p);
 
-    // run actual app logic
-    Notepad np("note.txt");
+    cout << "[OS] Notepad Process added to Ready Queue\n";
+    scheduler.runMultilevelQueue(2);   
+}
+void OperatingSystem::launchCalculator() {
 
-    int choice;
-    string text;
-
-    while (true) {
-
-        cout << "\n--- NOTEPAD ---\n";
-        cout << "1. Write\n2. Append\n3. View\n4. Exit\n";
-        cin >> choice;
-
-        cin.ignore();
-
-        if (choice == 1) {
-            cout << "Enter text: ";
-            getline(cin, text);
-            np.write(text);
-        }
-        else if (choice == 2) {
-            cout << "Enter text: ";
-            getline(cin, text);
-            np.append(text);
-        }
-        else if (choice == 3) {
-            np.view();
-        }
-        else {
-            cout << "[OS] Closing Notepad...\n";
-            freeResources(1, 1);
-            break;
-        }
+    if (!checkResources(1, 1)) {
+        cout << "Not enough resources\n";
+        return;
     }
+
+    Process p(rand() % 1000 + 1, 5);
+    p.setTaskType(Process::CALCULATOR);
+
+    allocateResources(1, 1);
+    scheduler.addProcess(p);
+
+    cout << "[OS] Calculator Process created\n";
+    scheduler.runMultilevelQueue(2);   
+}
+void OperatingSystem::launchClock() {
+
+   static Clock c;
+thread t(&Clock::start, &c);
+t.detach();
+
+    cout << "[OS] Clock started in background\n"<<c.getTime()<<endl;
 }

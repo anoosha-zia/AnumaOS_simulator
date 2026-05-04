@@ -1,6 +1,7 @@
 #include "process.h"
 #include <iostream>
-
+#include "calculator.h"
+#include "notepad.h"
 using namespace std;
 
 /*
@@ -108,4 +109,29 @@ void Process::unblock() {
 void Process::kill() {
     state = TERMINATED;
     remainingTime = 0;
+}
+void Process::setTaskType(TaskType t) {
+    taskType = t;
+}
+
+Process::TaskType Process::getTaskType() {
+    return taskType;
+}
+
+
+void Process::executeTask() {
+
+    if (taskType == CALCULATOR) {
+
+        Calculator c;
+        c.start();
+    }
+
+    else if (taskType == NOTEPAD) {
+
+    Notepad np("file.txt");
+
+    np.start();  
+}
+
 }

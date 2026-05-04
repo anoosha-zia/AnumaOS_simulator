@@ -2,7 +2,7 @@
 #define NOTEPAD_H
 
 #include <string>
-#include "FileSystem.h"
+#include "fileSystem.h"
 
 using namespace std;
 
@@ -20,6 +20,7 @@ public:
     void append(string text);
     void autoSave(string text);
     void view();
+    void start();
 
 };
 

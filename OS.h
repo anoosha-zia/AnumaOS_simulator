@@ -1,6 +1,9 @@
 #include "scheduler.h"
 #include "process.h"
-#include"tasks/notepad.h"
+#include"notepad.h"
+#include"calculator.h"
+#include"clock.h"
+
 
 class OperatingSystem {
 
@@ -37,4 +40,6 @@ public:
     void interruptKill(int pid);
     //tasks
     void launchNotepad();
+    void launchCalculator();
+    void launchClock();
 };

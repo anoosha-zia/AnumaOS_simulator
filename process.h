@@ -17,7 +17,14 @@ public:
         USER,        // calculator, notepad
         BACKGROUND   // copy, music simulation
     };
+    enum TaskType {
+        NONE,
+        CALCULATOR,
+        NOTEPAD,
+        CLOCK
+    };
 
+    TaskType taskType;
 private:
     int pid;
 
@@ -58,7 +65,8 @@ public:
 
     void setRAM(int r);
     void setHDD(int h);
-
+    void setTaskType(TaskType t);
+    TaskType getTaskType();
     // Core execution simulation
     void execute(int time);
 
@@ -68,6 +76,8 @@ public:
     void block();
     void unblock();
     void kill();
+    //execute user tasks as processes
+    void executeTask();
 };
 
 #endif

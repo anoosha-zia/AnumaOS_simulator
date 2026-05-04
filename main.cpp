@@ -1,6 +1,7 @@
 #include "OS.h"
 #include "process.h"
 #include <iostream>
+#include<unistd.h>
 
 using namespace std;
 
@@ -9,6 +10,8 @@ int main() {
     OperatingSystem os;
 
     os.bootScreen();
+    sleep(1);
+    system("clear");
 
     int ram, hdd, cores;
 
@@ -20,9 +23,11 @@ int main() {
 
     cout << "Enter CPU cores: ";
     cin >> cores;
+     sleep(1);
+    system("clear");
 
     os.setHardware(ram, hdd, cores);
-
+    os.launchClock();
     int choice;
  cout << "\n========== OS MENU ==========\n";
         cout << "1. Create Process\n";
@@ -33,7 +38,8 @@ int main() {
         cout << "6. Resume Process\n";
         cout << "7. Kill Process\n";
         cout<<  "8. Launch notepad\n";
-        cout << "9. Shutdown OS\n";
+        cout<<  "9. Launch calculator\n";
+        cout << "10. Shutdown OS\n";
         cout << "=============================\n";
     while (true) {
         cout << "Enter choice: ";
@@ -102,7 +108,10 @@ int main() {
         else if (choice == 8) {
         os.launchNotepad();
         }
-        else if (choice == 9) {
+         else if (choice == 9) {
+        os.launchCalculator();
+        }
+        else if (choice == 10) {
             os.shutdown();
             break;
         }
