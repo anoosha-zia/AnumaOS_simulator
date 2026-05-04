@@ -10,6 +10,7 @@ using namespace std;
 */
 Process::Process() {
     pid = 0;
+    hasExecuted=false;
     burstTime = 0;
     remainingTime = 0;
 
@@ -39,7 +40,13 @@ Process::Process(int id, int bt) {
     state = READY;
     type = USER;
 }
+bool Process::isExecuted() {
+    return hasExecuted;
+}
 
+void Process::markExecuted() {
+    hasExecuted = true;
+}
 /*
     execute:
     Simulates CPU execution for given time slice.

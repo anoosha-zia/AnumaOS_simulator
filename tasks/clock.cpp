@@ -3,17 +3,25 @@
 #include <ctime>
 #include <thread>
 #include <chrono>
-
-Clock::Clock() {}
+#include<mutex>
+#include<string>
+using namespace std;
+Clock::Clock() {currentTime="";}
 
 void Clock::start() {
 
     while (true) {
 
         time_t now = time(0);
-        currentTime = std::string(ctime(&now));
 
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::string tim = string(ctime(&now));
+
+        m.lock();
+        currentTime = tim;
+        m.unlock();
+
+        this_thread::sleep_for(chrono::seconds(1));
+        
     }
 }
 

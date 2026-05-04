@@ -3,6 +3,7 @@
 #include <iostream>
 #include <thread>
 #include <chrono>
+#include<string>
 
 using namespace std;
 
@@ -216,9 +217,11 @@ void OperatingSystem::launchCalculator() {
 }
 void OperatingSystem::launchClock() {
 
-   static Clock c;
-thread t(&Clock::start, &c);
-t.detach();
+    thread t(&Clock::start, &clock);
+    t.detach();
 
-    cout << "[OS] Clock started in background\n"<<c.getTime()<<endl;
+    cout << "[AnumaOS] Clock started in background\n";
+}
+string OperatingSystem::getClockTime() {
+    return clock.getTime();
 }

@@ -27,7 +27,7 @@ public:
     TaskType taskType;
 private:
     int pid;
-
+    bool hasExecuted;
     int burstTime;
     int remainingTime;
 
@@ -57,7 +57,8 @@ public:
 
     State getState();
     Type getType();
-
+    bool isExecuted();
+    void markExecuted();
     // Setters
     void setPriority(int p);
     void setState(State s);

@@ -59,21 +59,33 @@ void Scheduler::addProcess(Process p) {
     HIGH QUEUE → FCFS
     ============================
 */
-void Scheduler::executeFCFS(Process arr[], int &count) {
+void Scheduler::executeFCFS(Process queue[], int count) {
 
     for (int i = 0; i < count; i++) {
 
-        cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+        cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-        arr[i].setState(Process::RUNNING);
+        //  Run application ONLY ONCE
+        if (!queue[i].isExecuted()) {
 
-        while (arr[i].getRemainingTime() > 0) {
-            arr[i].execute(1);
+            queue[i].setState(Process::RUNNING);
+
+            queue[i].executeTask();   // launch calculator / notepad
+
+            queue[i].markExecuted();
         }
 
-        arr[i].setState(Process::TERMINATED);
+        //  Simulate CPU execution
+        while (queue[i].getRemainingTime() > 0) {
 
-        cout << "PID " << arr[i].getPID() << " completed (HIGH queue)\n";
+            queue[i].setState(Process::RUNNING);
+
+            queue[i].execute(1);
+        }
+
+        queue[i].setState(Process::TERMINATED);
+
+        cout << "PID " << queue[i].getPID() << " completed.\n";
     }
 }
 
@@ -82,7 +94,7 @@ void Scheduler::executeFCFS(Process arr[], int &count) {
     MEDIUM QUEUE → ROUND ROBIN
     ============================
 */
-void Scheduler::executeRoundRobin(Process arr[], int &count, int quantum) {
+void Scheduler::executeRoundRobin(Process queue[], int count, int quantum) {
 
     bool done = false;
 
@@ -92,21 +104,27 @@ void Scheduler::executeRoundRobin(Process arr[], int &count, int quantum) {
 
         for (int i = 0; i < count; i++) {
 
-            if (arr[i].getRemainingTime() > 0) {
+          if (queue[i].getRemainingTime() > 0) {
 
-                cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+    cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-                arr[i].setState(Process::RUNNING);
+    queue[i].setState(Process::RUNNING);
 
-                arr[i].execute(quantum);
+    //  RUN ONLY ONCE
+    if (!queue[i].isExecuted()) {
+        queue[i].executeTask();
+        queue[i].markExecuted();
+    }
 
-                if (arr[i].getRemainingTime() > 0)
-                    arr[i].setState(Process::READY);
-                else
-                    arr[i].setState(Process::TERMINATED);
+    queue[i].execute(quantum);
 
-                done = false;
-            }
+    if (queue[i].getRemainingTime() > 0)
+        queue[i].setState(Process::READY);
+    else
+        queue[i].setState(Process::TERMINATED);
+
+    done = false;
+}
         }
     }
 }
@@ -116,31 +134,33 @@ void Scheduler::executeRoundRobin(Process arr[], int &count, int quantum) {
     LOW QUEUE → PRIORITY
     ============================
 */
-void Scheduler::executePriority(Process arr[], int &count) {
-
-    // sort by priority
-    for (int i = 0; i < count - 1; i++) {
-        for (int j = 0; j < count - i - 1; j++) {
-
-            if (arr[j].getPriority() > arr[j + 1].getPriority()) {
-                swap(arr[j], arr[j + 1]);
-            }
-        }
-    }
+void Scheduler::executePriority(Process queue[], int count) {
 
     for (int i = 0; i < count; i++) {
 
-        cout << "\nContext Switch → PID " << arr[i].getPID() << endl;
+        cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-        arr[i].setState(Process::RUNNING);
+        // Run actual task only once
+        if (!queue[i].isExecuted()) {
 
-        while (arr[i].getRemainingTime() > 0) {
-            arr[i].execute(1);
+            queue[i].setState(Process::RUNNING);
+
+            queue[i].executeTask();   // interactive or app logic
+
+            queue[i].markExecuted();
         }
 
-        arr[i].setState(Process::TERMINATED);
+        //  Simulate CPU burst
+        while (queue[i].getRemainingTime() > 0) {
 
-        cout << "PID " << arr[i].getPID() << " completed (LOW queue)\n";
+            queue[i].setState(Process::RUNNING);
+
+            queue[i].execute(1);
+        }
+
+        queue[i].setState(Process::TERMINATED);
+
+        cout << "PID " << queue[i].getPID() << " completed.\n";
     }
 }
 

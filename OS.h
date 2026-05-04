@@ -3,12 +3,12 @@
 #include"notepad.h"
 #include"calculator.h"
 #include"clock.h"
-
+#include<string>
 
 class OperatingSystem {
 
 private:
-
+    Clock clock;
     int totalRAM, totalHDD, totalCores;
     int usedRAM, usedHDD;
 
@@ -42,4 +42,5 @@ public:
     void launchNotepad();
     void launchCalculator();
     void launchClock();
+    std::string getClockTime();
 };

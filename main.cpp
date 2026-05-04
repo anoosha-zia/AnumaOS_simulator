@@ -23,13 +23,15 @@ int main() {
 
     cout << "Enter CPU cores: ";
     cin >> cores;
-     sleep(1);
-    system("clear");
-
     os.setHardware(ram, hdd, cores);
+    sleep(1);
+    system("clear");
     os.launchClock();
     int choice;
- cout << "\n========== OS MENU ==========\n";
+ 
+    while (true) {
+    cout << "\n[CLOCK] " << os.getClockTime() << endl;
+    cout << "\n========== OS MENU ==========\n";
         cout << "1. Create Process\n";
         cout << "2. Kernel Mode ON\n";
         cout << "3. User Mode ON\n";
@@ -41,10 +43,11 @@ int main() {
         cout<<  "9. Launch calculator\n";
         cout << "10. Shutdown OS\n";
         cout << "=============================\n";
-    while (true) {
         cout << "Enter choice: ";
         cin >> choice;
-
+        sleep(1);
+        system("clear");
+        cout << "\n[CLOCK] " << os.getClockTime() << endl;
         if (choice == 1) {
 
             int id, bt, ramReq, hddReq, pr;
