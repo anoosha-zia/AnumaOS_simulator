@@ -2,7 +2,8 @@
 #define SCHEDULER_H
 
 #include "process.h"
-
+#include<atomic>
+#include<mutex>
 class Scheduler {
 
 private:
@@ -16,7 +17,8 @@ private:
     //interrupt helpers
     Process blockedQueue[50];
     int blockedCount = 0;
-    Process *currentProcess;
+    std::mutex mtx;
+    std::atomic<Process*> currentProcess;
     // helper for swapping (priority scheduling)
     void swap(Process &a, Process &b);
     //Helper Scheduling algorithms

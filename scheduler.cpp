@@ -64,19 +64,23 @@ void Scheduler::addProcess(Process p) {
 void Scheduler::executeFCFS(Process queue[], int count) {
   
     for (int i = 0; i < count; i++) {
-    currentProcess=&queue[i];
+   
         cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
         // Run until process finishes
         while (queue[i].getRemainingTime() > 0) {
-
+          
             // Skip blocked or killed processes
             if (queue[i].getState() == Process::BLOCKED ||
                 queue[i].getState() == Process::TERMINATED) {
                 break;
             }
-
+            
             queue[i].setState(Process::RUNNING);
+{
+        std::lock_guard<std::mutex> lock(mtx);
+        currentProcess = &queue[i];
+    }
 
             //  Run using thread (1 unit for FCFS simulation)
             thread t(&Process::execute, &queue[i], 1);
@@ -111,7 +115,7 @@ void Scheduler::executeRoundRobin(Process queue[], int count, int quantum) {
         done = true;
 
         for (int i = 0; i < count; i++) {
-            currentProcess=&queue[i];
+           
             // Skip finished processes
             if (queue[i].getRemainingTime() <= 0)
                 continue;
@@ -121,9 +125,13 @@ void Scheduler::executeRoundRobin(Process queue[], int count, int quantum) {
                 continue;
 
             cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
+            
 
             queue[i].setState(Process::RUNNING);
-
+               {
+        std::lock_guard<std::mutex> lock(mtx);
+        currentProcess = &queue[i];
+    }
             // Run process using thread with time slice
             thread t(&Process::execute, &queue[i], quantum);
             t.join();
@@ -148,20 +156,24 @@ void Scheduler::executePriority(Process queue[], int count) {
     // You already have swap() — you can use it here if needed
 
     for (int i = 0; i < count; i++) {
-        currentProcess=&queue[i];
+        
         cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
         // Run until process finishes
         while (queue[i].getRemainingTime() > 0) {
-
+            
             // Skip blocked or terminated processes
             if (queue[i].getState() == Process::BLOCKED ||
                 queue[i].getState() == Process::TERMINATED) {
                 break;
             }
+          
 
             queue[i].setState(Process::RUNNING);
-
+ {
+        std::lock_guard<std::mutex> lock(mtx);
+        currentProcess = &queue[i];
+    }
             //  Thread-based execution (like FCFS)
             thread t(&Process::execute, &queue[i], 1);
             t.join();
@@ -338,10 +350,13 @@ void Scheduler::killProcess(int pid) {
 }
 int Scheduler::getCurrentPID() {
 
-    if (currentProcess != nullptr &&
-        currentProcess->getState() != Process::TERMINATED) {
-        return currentProcess->getPID();
-    }
+    Process* p = currentProcess.load();  // extract pointer safely
 
-    return -1; // no process running
+    if (p == nullptr)
+        return -1;
+
+    if (p->getState() == Process::TERMINATED)
+        return -1;
+
+    return p->getPID();
 }

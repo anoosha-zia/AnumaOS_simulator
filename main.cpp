@@ -122,7 +122,24 @@ while (true) {
 
     else if (cmd == "kernel") os.enterKernelMode();
     else if (cmd == "user") os.enterUserMode();
+    else if (cmd == "help") {
 
+    cout << "\n========== AVAILABLE COMMANDS ==========\n";
+    cout << "ls            → show processes\n";
+    cout << "ps            → print queue\n";
+    cout << "current       → show running PID\n";
+    cout << "exec calc     → run calculator\n";
+    cout << "exec notepad  → run notepad\n";
+    cout << "block <pid>   → block process\n";
+    cout << "resume <pid>  → resume process\n";
+    cout << "kill <pid>    → kill process\n";
+    cout << "run           → start scheduler\n";
+    cout << "kernel        → enable kernel mode\n";
+    cout << "user          → enable user mode\n";
+    cout << "shutdown      → stop OS\n";
+    cout << "help          → show this menu\n";
+    cout << "=======================================\n";
+}
     else {
         cout << "Unknown command. Type help.\n";
     }

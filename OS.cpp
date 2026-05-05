@@ -153,9 +153,11 @@ void OperatingSystem::runMultilevelQueue(int quantum) {
         cout << "[ERROR] Kernel mode required to run scheduler\n";
         return;
     }
-    cout << "\n[OS] Launching Multilevel Queue Scheduler...\n";
+    //run → scheduler starts → shell continues immediately
+    cout << "[OS] Starting Scheduler in background...\n";
 
-    scheduler.runMultilevelQueue(quantum);
+    thread schedulerThread(&Scheduler::runMultilevelQueue, &scheduler, quantum);
+    schedulerThread.detach();
 }
 /*
     shutdown:
