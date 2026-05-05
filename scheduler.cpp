@@ -1,5 +1,6 @@
 #include "scheduler.h"
 #include <iostream>
+#include<thread>
 using namespace std;
 
 /*
@@ -11,6 +12,7 @@ Scheduler::Scheduler() {
     highCount = 0;
     midCount = 0;
     lowCount = 0;
+    currentProcess=nullptr;
 }
 
 /*
@@ -60,30 +62,36 @@ void Scheduler::addProcess(Process p) {
     ============================
 */
 void Scheduler::executeFCFS(Process queue[], int count) {
-
+  
     for (int i = 0; i < count; i++) {
-
+    currentProcess=&queue[i];
         cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-        //  Run application ONLY ONCE
-        if (!queue[i].isExecuted()) {
-
-            queue[i].setState(Process::RUNNING);
-
-            queue[i].executeTask();   // launch calculator / notepad
-
-            queue[i].markExecuted();
-        }
-
-        //  Simulate CPU execution
+        // Run until process finishes
         while (queue[i].getRemainingTime() > 0) {
 
+            // Skip blocked or killed processes
+            if (queue[i].getState() == Process::BLOCKED ||
+                queue[i].getState() == Process::TERMINATED) {
+                break;
+            }
+
             queue[i].setState(Process::RUNNING);
 
-            queue[i].execute(1);
+            //  Run using thread (1 unit for FCFS simulation)
+            thread t(&Process::execute, &queue[i], 1);
+            t.join();
+
+            // If still not finished → go back to READY
+            if (queue[i].getState() != Process::TERMINATED) {
+                queue[i].setState(Process::READY);
+            }
         }
 
-        queue[i].setState(Process::TERMINATED);
+        // Final state
+        if (queue[i].getState() != Process::TERMINATED) {
+            queue[i].setState(Process::TERMINATED);
+        }
 
         cout << "PID " << queue[i].getPID() << " completed.\n";
     }
@@ -103,28 +111,28 @@ void Scheduler::executeRoundRobin(Process queue[], int count, int quantum) {
         done = true;
 
         for (int i = 0; i < count; i++) {
+            currentProcess=&queue[i];
+            // Skip finished processes
+            if (queue[i].getRemainingTime() <= 0)
+                continue;
 
-          if (queue[i].getRemainingTime() > 0) {
+            // Skip blocked processes
+            if (queue[i].getState() == Process::BLOCKED)
+                continue;
 
-    cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
+            cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-    queue[i].setState(Process::RUNNING);
+            queue[i].setState(Process::RUNNING);
 
-    //  RUN ONLY ONCE
-    if (!queue[i].isExecuted()) {
-        queue[i].executeTask();
-        queue[i].markExecuted();
-    }
+            // Run process using thread with time slice
+            thread t(&Process::execute, &queue[i], quantum);
+            t.join();
 
-    queue[i].execute(quantum);
-
-    if (queue[i].getRemainingTime() > 0)
-        queue[i].setState(Process::READY);
-    else
-        queue[i].setState(Process::TERMINATED);
-
-    done = false;
-}
+            // Update state after execution
+            if (queue[i].getState() != Process::TERMINATED) {
+                queue[i].setState(Process::READY);
+                done = false;  // still work remaining
+            }
         }
     }
 }
@@ -136,34 +144,42 @@ void Scheduler::executeRoundRobin(Process queue[], int count, int quantum) {
 */
 void Scheduler::executePriority(Process queue[], int count) {
 
-    for (int i = 0; i < count; i++) {
+    // (Optional) If you have priority values, sort first
+    // You already have swap() — you can use it here if needed
 
+    for (int i = 0; i < count; i++) {
+        currentProcess=&queue[i];
         cout << "\nContext Switch → PID " << queue[i].getPID() << endl;
 
-        // Run actual task only once
-        if (!queue[i].isExecuted()) {
-
-            queue[i].setState(Process::RUNNING);
-
-            queue[i].executeTask();   // interactive or app logic
-
-            queue[i].markExecuted();
-        }
-
-        //  Simulate CPU burst
+        // Run until process finishes
         while (queue[i].getRemainingTime() > 0) {
 
+            // Skip blocked or terminated processes
+            if (queue[i].getState() == Process::BLOCKED ||
+                queue[i].getState() == Process::TERMINATED) {
+                break;
+            }
+
             queue[i].setState(Process::RUNNING);
 
-            queue[i].execute(1);
+            //  Thread-based execution (like FCFS)
+            thread t(&Process::execute, &queue[i], 1);
+            t.join();
+
+            // If still running → back to READY
+            if (queue[i].getState() != Process::TERMINATED) {
+                queue[i].setState(Process::READY);
+            }
         }
 
-        queue[i].setState(Process::TERMINATED);
+        // Final state safety
+        if (queue[i].getState() != Process::TERMINATED) {
+            queue[i].setState(Process::TERMINATED);
+        }
 
         cout << "PID " << queue[i].getPID() << " completed.\n";
     }
 }
-
 /*
     MAIN MLQ SCHEDULER
 */
@@ -319,4 +335,13 @@ void Scheduler::killProcess(int pid) {
     if (!found) {
         cout << "[INTERRUPT] ERROR: PID " << pid << " NOT FOUND\n";
     }
+}
+int Scheduler::getCurrentPID() {
+
+    if (currentProcess != nullptr &&
+        currentProcess->getState() != Process::TERMINATED) {
+        return currentProcess->getPID();
+    }
+
+    return -1; // no process running
 }

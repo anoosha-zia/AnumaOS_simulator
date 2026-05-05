@@ -1,5 +1,6 @@
 #include "process.h"
 #include <iostream>
+#include<unistd.h>
 #include "calculator.h"
 #include "notepad.h"
 using namespace std;
@@ -40,32 +41,48 @@ Process::Process(int id, int bt) {
     state = READY;
     type = USER;
 }
-bool Process::isExecuted() {
-    return hasExecuted;
-}
 
-void Process::markExecuted() {
-    hasExecuted = true;
-}
 /*
     execute:
     Simulates CPU execution for given time slice.
     This is used by Scheduler (Round Robin etc.)
 */
-void Process::execute(int time) {
+void Process::execute(int timeSlice) {
+
+    if (state == BLOCKED || state == TERMINATED)
+        return;
 
     state = RUNNING;
 
-    if (remainingTime > time)
-        remainingTime -= time;
-    else
-        remainingTime = 0;
+    int actualTime;
 
-    // If finished → terminate
-    if (remainingTime == 0)
-        state = TERMINATED;
+    if (remainingTime > timeSlice)
+        actualTime = timeSlice;
     else
+        actualTime = remainingTime;
+
+    //  simulate actual work 
+    cout << "PID " << pid << " executing ";
+
+    if (taskType == CALCULATOR)
+        cout << "[Calculator]";
+    else if (taskType == NOTEPAD)
+        cout << "[Notepad]";
+
+    cout << " for " << actualTime << " sec\n";
+
+    sleep(actualTime);
+
+    remainingTime -= actualTime;
+
+    if (remainingTime <= 0) {
+        remainingTime = 0;
+        state = TERMINATED;
+        cout << "PID " << pid << " completed\n";
+    }
+    else {
         state = READY;
+    }
 }
 
 /*
@@ -126,19 +143,4 @@ Process::TaskType Process::getTaskType() {
 }
 
 
-void Process::executeTask() {
 
-    if (taskType == CALCULATOR) {
-
-        Calculator c;
-        c.start();
-    }
-
-    else if (taskType == NOTEPAD) {
-
-    Notepad np("file.txt");
-
-    np.start();  
-}
-
-}

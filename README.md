@@ -38,9 +38,7 @@ OS_Project/
 │     ├── file_ops.cpp
 │     └── ...
 ##🚀 How to Run
-g++ main.cpp -o os -pthread
-./os
-
+g++ -I. -I./tasks *.cpp tasks/*.cpp -o main
 Compile tasks separately:
 
 g++ tasks/calculator.cpp -o calculator
@@ -52,3 +50,66 @@ Terminal-based UI
 ##👨‍🎓 Academic Purpose
 
 This project was developed as part of an Operating Systems Lab course to demonstrate understanding of OS-level concepts through simulation.
+
+##Command Categories
+
+The shell supports the following categories of commands:
+
+##🧠 A. System Commands
+🔹 Show Help
+help
+
+Displays all available commands.
+
+🔹 Shutdown System
+shutdown
+
+Safely terminates OS execution and clears resources.
+
+🔹 Mode Switching
+kernel
+
+Enables kernel mode.
+
+user
+
+Switches back to user mode.
+
+🔹 Clock View
+clock
+
+Displays current system time.
+
+##⚙️ B. Process Management Commands
+🔹 Create Process
+create
+
+Then user enters:
+
+PID
+Burst Time
+RAM requirement
+HDD requirement
+Priority
+
+Example:
+
+AnumaOS> create
+PID: 1
+Burst Time: 5
+RAM: 2
+HDD: 10
+Priority: 1
+🔹 Run Scheduler (MLQ)
+run
+
+Then input:
+
+Quantum: 2
+
+Executes Multilevel Queue Scheduling:
+
+High Queue → FCFS
+Medium Queue → Round Robin
+Low Queue → Priority Scheduling
+exec notepad

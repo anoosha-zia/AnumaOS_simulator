@@ -57,8 +57,6 @@ public:
 
     State getState();
     Type getType();
-    bool isExecuted();
-    void markExecuted();
     // Setters
     void setPriority(int p);
     void setState(State s);
@@ -69,7 +67,7 @@ public:
     void setTaskType(TaskType t);
     TaskType getTaskType();
     // Core execution simulation
-    void execute(int time);
+    void execute(int timeSlice);
 
     // Utility (for OS logging)
     void printInfo();
@@ -77,8 +75,6 @@ public:
     void block();
     void unblock();
     void kill();
-    //execute user tasks as processes
-    void executeTask();
 };
 
 #endif

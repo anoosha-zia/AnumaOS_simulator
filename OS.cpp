@@ -121,6 +121,11 @@ void OperatingSystem::freeResources(int ram, int hdd) {
     FULL integration with scheduler
 */
 void OperatingSystem::createProcess(Process p) {
+//this should be done in kernel mode only
+     if (!kernelMode) {
+        cout << "[ERROR] Kernel mode required to create process\n";
+        return;
+    }
 
     cout << "\n[OS] Creating Process PID: " << p.getPID() << endl;
 
@@ -144,7 +149,10 @@ void OperatingSystem::createProcess(Process p) {
 */
 
 void OperatingSystem::runMultilevelQueue(int quantum) {
-
+     if (!kernelMode) {
+        cout << "[ERROR] Kernel mode required to run scheduler\n";
+        return;
+    }
     cout << "\n[OS] Launching Multilevel Queue Scheduler...\n";
 
     scheduler.runMultilevelQueue(quantum);
@@ -224,4 +232,10 @@ void OperatingSystem::launchClock() {
 }
 string OperatingSystem::getClockTime() {
     return clock.getTime();
+}
+void OperatingSystem::printAllQueues(){
+scheduler.printQueues();
+}
+int OperatingSystem::getCurrentPID() {
+    return scheduler.getCurrentPID();
 }

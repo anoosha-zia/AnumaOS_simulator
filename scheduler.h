@@ -16,13 +16,13 @@ private:
     //interrupt helpers
     Process blockedQueue[50];
     int blockedCount = 0;
-
+    Process *currentProcess;
     // helper for swapping (priority scheduling)
     void swap(Process &a, Process &b);
     //Helper Scheduling algorithms
     void executeFCFS(Process arr[], int count);
-void executeRoundRobin(Process arr[], int count, int quantum);
-void executePriority(Process arr[], int count);
+    void executeRoundRobin(Process arr[], int count, int quantum);
+    void executePriority(Process arr[], int count);
 public:
 
     Scheduler();
@@ -39,6 +39,7 @@ public:
     void blockProcess(int pid);
     void resumeProcess(int pid);
     void killProcess(int pid);
+    int getCurrentPID();
 };
 
 #endif

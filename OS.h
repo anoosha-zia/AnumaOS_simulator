@@ -43,4 +43,6 @@ public:
     void launchCalculator();
     void launchClock();
     std::string getClockTime();
+    void printAllQueues();
+    int getCurrentPID();
 };

@@ -27,102 +27,106 @@ int main() {
     sleep(1);
     system("clear");
     os.launchClock();
-    int choice;
- 
-    while (true) {
+    
+  string cmd;
+
+while (true) {
+
+    cout << "\nAnumaOS> ";
+    cin >> cmd;
+
+    system("clear");
     cout << "\n[CLOCK] " << os.getClockTime() << endl;
-    cout << "\n========== OS MENU ==========\n";
-        cout << "1. Create Process\n";
-        cout << "2. Kernel Mode ON\n";
-        cout << "3. User Mode ON\n";
-        cout << "4. Run MLQ(Multi Level Queue)\n";
-        cout << "5. Block Process (Interrupt)\n";
-        cout << "6. Resume Process\n";
-        cout << "7. Kill Process\n";
-        cout<<  "8. Launch notepad\n";
-        cout<<  "9. Launch calculator\n";
-        cout << "10. Shutdown OS\n";
-        cout << "=============================\n";
-        cout << "Enter choice: ";
-        cin >> choice;
-        sleep(1);
-        system("clear");
-        cout << "\n[CLOCK] " << os.getClockTime() << endl;
-        if (choice == 1) {
 
-            int id, bt, ramReq, hddReq, pr;
+    // ================= ALIASES =================
 
-            cout << "Enter PID: ";
-            cin >> id;
+    if (cmd == "ls") {
+        cmd = "ps";   // alias
+    }
+    else if (cmd == "exit") {
+        cmd = "shutdown";
+    }
 
-            cout << "Burst Time: ";
-            cin >> bt;
+    // ================= COMMANDS =================
 
-            cout << "RAM Required: ";
-            cin >> ramReq;
+    if (cmd == "ps") {
+        cout << "\n[OS] Showing Process Queues...\n";
+        os.printAllQueues();   // you already have printQueues()
+    }
 
-            cout << "HDD Required: ";
-            cin >> hddReq;
+    else if (cmd == "shutdown") {
+        os.shutdown();
+        break;
+    }
 
-            cout << "Priority: ";
-            cin >> pr;
+    // ================= EXEC SYSTEM =================
 
-            Process p(id, bt);
-            p.setRAM(ramReq);
-            p.setHDD(hddReq);
-            p.setPriority(pr);
+    else if (cmd == "exec") {
 
-            os.createProcess(p);
+        string app;
+        cin >> app;
+
+        if (app == "calc") {
+            os.launchCalculator();
         }
-        else if (choice == 2) {
-            os.enterKernelMode();
+        else if (app == "notepad") {
+            os.launchNotepad();
         }
-
-        else if (choice == 3) {
-            os.enterUserMode();
-        }
-        else if (choice == 4) {
-             int q;
-            cout << "Enter Quantum for MLQ (User Queue): ";
-            cin >> q;
-
-            os.runMultilevelQueue(q);
-        }
-        else if (choice == 5) {
-            int pid;
-            cout << "Enter PID to block: ";
-            cin >> pid;
-            os.interruptBlock(pid);
-        }
-
-        else if (choice == 6) {
-            int pid;
-            cout << "Enter PID to resume: ";
-            cin >> pid;
-            os.interruptResume(pid);
-        }
-
-        else if (choice == 7) {
-            int pid;
-            cout << "Enter PID to kill: ";
-            cin >> pid;
-            os.interruptKill(pid);
-        }
-        else if (choice == 8) {
-        os.launchNotepad();
-        }
-         else if (choice == 9) {
-        os.launchCalculator();
-        }
-        else if (choice == 10) {
-            os.shutdown();
-            break;
-        }
-
         else {
-            cout << "Invalid choice!\n";
+            cout << "Unknown app\n";
         }
     }
 
+    // ================= EXISTING COMMANDS =================
+
+    else if (cmd == "create") {
+        int id, bt, ramReq, hddReq, pr;
+
+        cout << "PID: "; cin >> id;
+        cout << "Burst Time: "; cin >> bt;
+        cout << "RAM: "; cin >> ramReq;
+        cout << "HDD: "; cin >> hddReq;
+        cout << "Priority: "; cin >> pr;
+
+        Process p(id, bt);
+        p.setRAM(ramReq);
+        p.setHDD(hddReq);
+        p.setPriority(pr);
+
+        os.createProcess(p);
+    }
+
+    else if (cmd == "run") {
+        int q;
+        cout << "Quantum: ";
+        cin >> q;
+        os.runMultilevelQueue(q);
+    }
+    else if (cmd == "current") {
+    cout << "Current PID: " << os.getCurrentPID() << endl;
+    }
+    else if (cmd == "block") {
+        int pid; cin >> pid;
+        os.interruptBlock(pid);
+    }
+
+    else if (cmd == "resume") {
+        int pid; cin >> pid;
+        os.interruptResume(pid);
+    }
+
+    else if (cmd == "kill") {
+        int pid; cin >> pid;
+        os.interruptKill(pid);
+    }
+
+    else if (cmd == "kernel") os.enterKernelMode();
+    else if (cmd == "user") os.enterUserMode();
+
+    else {
+        cout << "Unknown command. Type help.\n";
+    }
+}
+        
     return 0;
 }
